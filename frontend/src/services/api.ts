@@ -1,6 +1,5 @@
 
-export const API_BASE = 'http://127.0.0.1:8000/api';
-
+export const API_BASE = 'https://ai-business-intelligence-1-280q.onrender.com/api';
 const TOKEN_KEY = 'business_platform_token';
 
 export const auth = {
