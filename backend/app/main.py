@@ -20,18 +20,22 @@ from .api import (
 
 app = FastAPI(title="AI Business Intelligence Platform")
 
+# CORS Configuration
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
         "http://localhost:5173",
-        "http://127.0.0.1:5173"
+        "http://127.0.0.1:5173",
+        "https://ai-business-intelligence-frontend-gnep.onrender.com"
     ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"]
 )
 
+
 def run_database_migration():
+
     # Create new tables, including users.
     Base.metadata.create_all(bind=engine)
 
@@ -43,6 +47,7 @@ def run_database_migration():
 
     # Add columns to an existing database.
     with engine.begin() as connection:
+
         if "owner_id" not in columns:
             connection.execute(text(
                 "ALTER TABLE businesses ADD COLUMN owner_id INTEGER"
@@ -71,6 +76,7 @@ def run_database_migration():
         ).all()
 
         for clothing in clothing_businesses:
+
             # Remove associated model files and records.
             old_models = db.query(models.MLModel).filter(
                 models.MLModel.business_id == clothing.id
@@ -121,17 +127,62 @@ def run_database_migration():
     finally:
         db.close()
 
+
 run_database_migration()
 
-app.include_router(auth.router, prefix="/api/auth", tags=["Authentication"])
-app.include_router(business.router, prefix="/api/businesses", tags=["Businesses"])
-app.include_router(dataset.router, prefix="/api/datasets", tags=["Datasets"])
-app.include_router(analytics.router, prefix="/api/analytics", tags=["Analytics"])
-app.include_router(inventory.router, prefix="/api/inventory", tags=["Inventory"])
-app.include_router(ml.router, prefix="/api/ml", tags=["Machine Learning"])
-app.include_router(forecast.router, prefix="/api/forecast", tags=["Forecasting"])
-app.include_router(assistant.router, prefix="/api/assistant", tags=["AI Assistant"])
+
+# API Routes
+app.include_router(
+    auth.router,
+    prefix="/api/auth",
+    tags=["Authentication"]
+)
+
+app.include_router(
+    business.router,
+    prefix="/api/businesses",
+    tags=["Businesses"]
+)
+
+app.include_router(
+    dataset.router,
+    prefix="/api/datasets",
+    tags=["Datasets"]
+)
+
+app.include_router(
+    analytics.router,
+    prefix="/api/analytics",
+    tags=["Analytics"]
+)
+
+app.include_router(
+    inventory.router,
+    prefix="/api/inventory",
+    tags=["Inventory"]
+)
+
+app.include_router(
+    ml.router,
+    prefix="/api/ml",
+    tags=["Machine Learning"]
+)
+
+app.include_router(
+    forecast.router,
+    prefix="/api/forecast",
+    tags=["Forecasting"]
+)
+
+app.include_router(
+    assistant.router,
+    prefix="/api/assistant",
+    tags=["AI Assistant"]
+)
+
 
 @app.get("/")
 def root():
-    return {"message": "AI Business Intelligence API is running"}
+    return {
+        "message": "AI Business Intelligence API is running"
+    }
